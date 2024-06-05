@@ -32,29 +32,32 @@ class HomeDefaultBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double minDrawerWidth = 200;
+    double recommendedDrawerWidth = MediaQuery.of(context).size.width * .4;
     return Scaffold(
+      drawer: Drawer(
+        width: recommendedDrawerWidth < minDrawerWidth ? minDrawerWidth : recommendedDrawerWidth,
+        child: const SettingsPage(),
+      ),
       backgroundColor: Colors.black,
       body: ColoredContainer(state.currentPanel),
-      floatingActionButton: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          FloatingActionButton(
-            onPressed: context.read<HomeController>().startStopAction,
-            child: Icon(state.currentActionIcon),
-          ),
-          const SizedBox(height: 8),
-          FloatingActionButton(
-            child: const Icon(Icons.settings),
-            onPressed: () {
-              showModalBottomSheet(
-                context: context,
-                builder: (ctx) => const SettingsPage(),
-              );
-            },
-          ),
-        ],
-      ),
+      floatingActionButton: Builder(builder: (context) {
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            FloatingActionButton(
+              onPressed: context.read<HomeController>().startStopAction,
+              child: Icon(state.currentActionIcon),
+            ),
+            const SizedBox(height: 8),
+            FloatingActionButton(
+              onPressed: Scaffold.of(context).openDrawer,
+              child: const Icon(Icons.settings),
+            ),
+          ],
+        );
+      }),
     );
   }
 }

@@ -4,12 +4,13 @@ import 'package:flutter/material.dart';
 
 import '../domain/entities/colored_panel.entity.dart';
 import '../domain/entities/options.entity.dart';
+import '../domain/enums/sort_type.enum.dart';
 import 'home.state.dart';
 
 class HomeController extends ValueNotifier<HomeState> {
   HomeController()
       : super(InitialHomeState(
-          options: OptionsEntity(panels: _defaultPanels),
+          options: OptionsEntity(panels: _defaultPanels, sortType: SortType.sequential),
           currentPanelIndex: 0,
           currentActionIcon: Icons.play_arrow,
         ));
@@ -23,6 +24,16 @@ class HomeController extends ValueNotifier<HomeState> {
   ];
 
   bool isExecuting = false;
+
+  setSortType(SortType sortType) {
+    value = value.copyWith(options: value.options.copyWith(sortType: sortType));
+  }
+
+  addPanel() {
+    List<ColoredPanelEntity> newList = List.from(value.options.panels);
+    newList.add(ColoredPanelEntity(color: Colors.white, duration: _defaultDuration));
+    value = value.copyWith(options: value.options.copyWith(panels: newList));
+  }
 
   removePanel(ColoredPanelEntity panel) {
     List<ColoredPanelEntity> newList = List.from(value.options.panels)..remove(panel);
@@ -54,7 +65,11 @@ class HomeController extends ValueNotifier<HomeState> {
     value = (value as InitialHomeState).copyWith(currentActionIcon: Icons.pause);
     while (isExecuting) {
       await Future.delayed(value.currentPanel.duration);
-      nextSequential();
+      if (value.options.sortType == SortType.sequential) {
+        nextSequential();
+      } else {
+        nextRandom();
+      }
     }
   }
 
@@ -63,7 +78,11 @@ class HomeController extends ValueNotifier<HomeState> {
   }
 
   nextRandom() {
-    next(Random().nextInt(value.options.panels.length));
+    int nextValue = Random().nextInt(value.options.panels.length);
+    while (nextValue == value.currentPanelIndex) {
+      nextValue = Random().nextInt(value.options.panels.length);
+    }
+    next(nextValue);
   }
 
   nextSequential() {

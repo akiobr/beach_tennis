@@ -20,6 +20,12 @@ class ColorOption extends StatelessWidget {
       height: 120,
       width: 120,
       child: Card(
+        shape: context.read<HomeController>().value.currentPanel == panel
+            ? RoundedRectangleBorder(
+                side: const BorderSide(color: Colors.cyan, width: 3),
+                borderRadius: BorderRadius.circular(10),
+              )
+            : null,
         color: panel.color,
         child: Column(
           children: [
@@ -89,7 +95,7 @@ class ColorOption extends StatelessWidget {
                   icon: const Icon(Icons.edit, size: 20),
                 ),
                 IconButton(
-                  onPressed: () => context.read<HomeController>().removePanel(panel),
+                  onPressed: context.read<HomeController>().value.currentPanel == panel ? null : () => context.read<HomeController>().removePanel(panel),
                   icon: const Icon(Icons.delete, size: 20),
                 ),
               ],
